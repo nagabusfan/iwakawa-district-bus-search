@@ -7,6 +7,7 @@
   ],
   "fare_settings": {
     "base_fare": 150,
-    "per_km"20
+    "interval_km": 2.5,
+    "interval_fare": 30
   }
 }
