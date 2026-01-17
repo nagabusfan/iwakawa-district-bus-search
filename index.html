@@ -3,120 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>岩川県 運賃・経路・位置情報検索システム</title>
+    <title>岩川県交通｜運行支援システム（IT会社共通基盤）</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; }
-        header { background-color: #0d47a1; color: white; padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        
-        /* タブ切り替えボタン */
-        .tab-container { display: flex; justify-content: center; background: #fff; border-bottom: 2px solid #ddd; }
-        .tab { padding: 15px 30px; cursor: pointer; font-weight: bold; color: #666; transition: 0.3s; }
-        .tab.active { color: #0d47a1; border-bottom: 4px solid #0d47a1; background: #e3f2fd; }
+        /* 岩川県交通カラー：青(#0d47a1) と 緑(#2e7d32) */
+        :root {
+            --primary-color: #0d47a1; /* 県交通・青 */
+            --accent-color: #2e7d32;  /* 県交通・緑 */
+            --bg-color: #f4f7f9;
+        }
 
-        .container { max-width: 800px; margin: 20px auto; padding: 15px; }
-        .content-panel { display: none; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .content-panel.active { display: block; }
+        body { font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: #333; }
+        
+        /* IT会社共通ヘッダーのデザイン（少し無機質でプロっぽい） */
+        header { background-color: var(--primary-color); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--accent-color); }
+        .system-name { font-size: 14px; opacity: 0.8; letter-spacing: 1px; }
+
+        .tab-menu { display: flex; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tab-item { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; color: #666; border-bottom: 3px solid transparent; }
+        .tab-item.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background: #f0f4ff; }
+
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
         /* 検索フォーム */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .btn-search { width: 100%; background: #2e7d32; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: var(--primary-color); }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .input-group input:focus { border-color: var(--primary-color); }
 
-        /* 結果表示 */
-        #result-area { margin-top: 20px; padding: 20px; border-radius: 10px; border: 2px solid #0d47a1; display: none; }
-        .fare-price { font-size: 32px; font-weight: 900; color: #0d47a1; }
-        .warning-box { background: #fff3e0; border-left: 5px solid #ff9800; padding: 10px; margin-top: 15px; font-size: 14px; }
+        .btn-exec { width: 100%; background: var(--accent-color); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 4px 0 #1b5e20; }
+        .btn-exec:active { transform: translateY(2px); box-shadow: 0 2px 0 #1b5e20; }
 
-        /* マップ(準備中) */
-        .map-placeholder { width: 100%; height: 400px; background: #eee; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #999; }
+        /* 検索結果 */
+        #search-result { margin-top: 25px; display: none; animation: fadeIn 0.5s; }
+        .result-box { border: 2px solid var(--primary-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .fare-display { font-size: 40px; font-weight: 900; color: var(--primary-color); margin: 10px 0; }
+        
+        .matsuzono-info { background: #fff3e0; border-left: 5px solid #ff9800; padding: 15px; margin-top: 15px; text-align: left; font-size: 13px; line-height: 1.6; }
+
+        /* 位置情報（準備中） */
+        .live-map-area { height: 400px; background: #e0e0e0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #777; border: 2px dashed #bbb; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="margin:0; font-size: 20px;">岩川県交通 運行支援システム</h1>
+    <div style="font-weight: 900;">岩川県交通</div>
+    <div class="system-name">Multi-Route System v1.0</div>
 </header>
 
-<div class="tab-container">
-    <div class="tab active" onclick="switchTab('search')">経路・運賃検索</div>
-    <div class="tab" onclick="switchTab('live')">バス位置情報</div>
+<div class="tab-menu">
+    <div class="tab-item active" id="tab-search" onclick="switchMode('search')">経路・運賃検索</div>
+    <div class="tab-item" id="tab-live" onclick="switchMode('live')">バスロケ (LIVE)</div>
 </div>
 
 <div class="container">
-    <div id="panel-search" class="content-panel active">
-        <div class="form-group">
-            <label>出発地</label>
-            <input type="text" id="from-input" placeholder="例: 堀岡駅">
-        </div>
-        <div class="form-group">
-            <label>目的地</label>
-            <input type="text" id="to-input" placeholder="例: 下堂">
-        </div>
-        <button class="btn-search" onclick="calculateFare()">検索する</button>
+    <div id="mode-search">
+        <div class="card">
+            <div class="input-group">
+                <label>■ 出発停留所</label>
+                <input type="text" id="start-st" placeholder="入力またはメインサイトから引き継ぎ">
+            </div>
+            <div class="input-group">
+                <label>■ 目的停留所</label>
+                <input type="text" id="end-st" placeholder="入力またはメインサイトから引き継ぎ">
+            </div>
+            <button class="btn-exec" onclick="runSearch()">最安運賃を検索</button>
 
-        <div id="result-area">
-            <div>片道合計運賃</div>
-            <div class="fare-price"><span id="res-fare">---</span>円</div>
-            <div id="matsuzono-warning" class="warning-box" style="display:none;">
-                <strong>⚠️ 松曽野地区からの乗り継ぎ</strong><br>
-                「のりつぎ券」をお持ちでない場合、実際の運賃と異なる場合があります。
+            <div id="search-result">
+                <div class="result-box">
+                    <div style="font-size: 12px; font-weight: bold;">片道普通運賃（大人）</div>
+                    <div class="fare-display" id="fare-val">--- 円</div>
+                    <div style="font-size: 12px; color: #666;">※ICカード・のりつぎ券利用時は異なります</div>
+                </div>
+                <div id="matsuzono-box" class="matsuzono-info" style="display:none;">
+                    <strong>【重要】松曽野地区 乗り継ぎ案内</strong><br>
+                    この区間は松曽野地区の循環・支線が含まれます。「のりつぎ券」をお持ちの場合、基幹バスの初乗り運賃は免除されます。表示運賃は合算の目安です。
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="panel-live" class="content-panel">
-        <div class="map-placeholder">
-            <div style="font-size: 50px;">📍</div>
-            <p>Robloxマップ連動・バスロケーションシステム</p>
-            <p style="font-size: 12px;">(現在開発中 - サーバー選択機能実装予定)</p>
+    <div id="mode-live" style="display:none;">
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--primary-color);">リアルタイム運行状況</h3>
+            <p style="font-size:13px;">サーバーを選択すると、走行中の25台のバス位置が表示されます。</p>
+            <div class="live-map-area">
+                <div style="font-size:40px;">🛰️</div>
+                <p>GPS信号待機中...</p>
+                <p style="font-size:11px;">(Roblox Data Link API 準備中)</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // URLから情報を引き継ぐ
+    // ページ読み込み時の処理
     window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        const from = params.get('from');
-        const to = params.get('to');
-        if (from) document.getElementById('from-input').value = from;
-        if (to) document.getElementById('to-input').value = to;
-        
-        // もし情報が最初から入ってたら、自動で検索するのもアリ
-        if (from && to) calculateFare();
+        const p = new URLSearchParams(window.location.search);
+        const f = p.get('from');
+        const t = p.get('to');
+        if (f) document.getElementById('start-st').value = f;
+        if (t) document.getElementById('end-st').value = t;
+        if (f && t) runSearch();
     };
 
-    function switchTab(mode) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
-        
-        if (mode === 'search') {
-            document.querySelectorAll('.tab')[0].classList.add('active');
-            document.getElementById('panel-search').classList.add('active');
+    function switchMode(m) {
+        if (m === 'search') {
+            document.getElementById('mode-search').style.display = 'block';
+            document.getElementById('mode-live').style.display = 'none';
+            document.getElementById('tab-search').classList.add('active');
+            document.getElementById('tab-live').classList.remove('active');
         } else {
-            document.querySelectorAll('.tab')[1].classList.add('active');
-            document.getElementById('panel-live').classList.add('active');
+            document.getElementById('mode-search').style.display = 'none';
+            document.getElementById('mode-live').style.display = 'block';
+            document.getElementById('tab-search').classList.remove('active');
+            document.getElementById('tab-live').classList.add('active');
         }
     }
 
-    function calculateFare() {
-        // 今は簡単なシミュレーションのみ
-        const from = document.getElementById('from-input').value;
-        const to = document.getElementById('to-input').value;
-        
-        if(!from || !to) return;
+    function runSearch() {
+        const start = document.getElementById('start-st').value;
+        const end = document.getElementById('end-st').value;
+        if(!start || !end) return;
 
-        // 結果を表示
-        document.getElementById('result-area').style.display = 'block';
-        document.getElementById('res-fare').innerText = '320'; // 仮の数字
+        document.getElementById('search-result').style.display = 'block';
+        document.getElementById('fare-val').innerText = "320 円"; // あとで計算ロジックを入れる
 
-        // 松曽野地区のチェック（今は名前で仮判定）
-        if (from.includes("松曽野") || to.includes("松曽野")) {
-            document.getElementById('matsuzono-warning').style.display = 'block';
+        // 松曽野チェック
+        if (start.includes("松曽野") || end.includes("松曽野")) {
+            document.getElementById('matsuzono-box').style.display = 'block';
         } else {
-            document.getElementById('matsuzono-warning').style.display = 'none';
+            document.getElementById('matsuzono-box').style.display = 'none';
         }
     }
 </script>
