@@ -51,7 +51,7 @@
 
 <header>
     <a href="https://nagabusfan.github.io/iwakawa/" class="header-logo">岩川県交通</a>
-    <div class="system-name">岩川県交通検索システム<br>Powered by Iwakawa IT Service</div>
+    <div class="system-name">岩川県 運行支援基盤<br>Powered by Iwakawa IT Service</div>
 </header>
 
 <div class="tab-menu">
@@ -88,7 +88,7 @@
                 </div>
                 <div id="matsuzono-box" class="matsuzono-info" style="display:none;">
                     <strong>【松曽野地区 乗り継ぎ注意】</strong><br>
-                    循環・支線をご利用の場合、乗車時に「のりつぎ券」をお取りください。
+                    循環・支線から継走する場合、乗車時に「のりつぎ券」をお取りください。
                 </div>
             </div>
         </div>
@@ -162,7 +162,7 @@
         const distance = Math.abs(start.dist - end.dist);
         document.getElementById('dist-val').innerText = distance.toFixed(1);
 
-        // 2. 運賃計算（2.5kmごとに30円加算）
+        // 2. 運賃計算（2.5kmごとに30円加算・現金IC同額）
         const settings = busData.fare_settings;
         const additionalFare = Math.ceil(distance / settings.interval_km) * settings.interval_fare;
         const fare = settings.base_fare + additionalFare;
@@ -170,11 +170,21 @@
 
         // 3. 共通路線の判定
         const common = start.lines.filter(l => end.lines.includes(l));
-        document.getElementById('route-val').innerText = common.length > 0 ? common.join('・') : "複数路線乗り継ぎ";
+        const isTransferNeeded = (common.length === 0);
 
-        // 4. エリアチェック
-        document.getElementById('matsuzono-box').style.display = 
-            (start.area === "matsuzono" || end.area === "matsuzono") ? 'block' : 'none';
+        if (isTransferNeeded) {
+            document.getElementById('route-val').innerText = "複数路線の乗り継ぎが必要です";
+        } else {
+            document.getElementById('route-val').innerText = common.join('・');
+        }
+
+        // 4. 松曽野チェック（乗り継ぎが必要 且つ どちらかが松曽野エリアの場合のみ表示）
+        const isMatsuzonoArea = (start.area === "matsuzono" || end.area === "matsuzono");
+        if (isTransferNeeded && isMatsuzonoArea) {
+            document.getElementById('matsuzono-box').style.display = 'block';
+        } else {
+            document.getElementById('matsuzono-box').style.display = 'none';
+        }
     }
 
     function switchMode(m) {
