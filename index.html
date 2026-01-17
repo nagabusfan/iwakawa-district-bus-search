@@ -3,142 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>岩川県交通｜運行支援システム（IT会社共通基盤）</title>
+    <title>岩川県交通｜運行支援システム</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 岩川県交通カラー：青(#0d47a1) と 緑(#2e7d32) */
-        :root {
-            --primary-color: #0d47a1; /* 県交通・青 */
-            --accent-color: #2e7d32;  /* 県交通・緑 */
-            --bg-color: #f4f7f9;
-        }
-
+        :root { --primary-color: #0d47a1; --accent-color: #2e7d32; --bg-color: #f4f7f9; }
         body { font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: #333; }
         
-        /* IT会社共通ヘッダーのデザイン（少し無機質でプロっぽい） */
         header { background-color: var(--primary-color); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--accent-color); }
-        .system-name { font-size: 14px; opacity: 0.8; letter-spacing: 1px; }
+        .header-logo { cursor: pointer; font-weight: 900; text-decoration: none; color: white; font-size: 18px; }
+        .system-name { font-size: 11px; opacity: 0.8; text-align: right; }
 
         .tab-menu { display: flex; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-item { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; color: #666; border-bottom: 3px solid transparent; }
         .tab-item.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background: #f0f4ff; }
 
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-        /* 検索フォーム */
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: var(--primary-color); }
+        .input-group { margin-bottom: 15px; position: relative; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: var(--primary-color); }
         .input-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .input-group input:focus { border-color: var(--primary-color); }
-
-        .btn-exec { width: 100%; background: var(--accent-color); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 4px 0 #1b5e20; }
-        .btn-exec:active { transform: translateY(2px); box-shadow: 0 2px 0 #1b5e20; }
-
-        /* 検索結果 */
-        #search-result { margin-top: 25px; display: none; animation: fadeIn 0.5s; }
-        .result-box { border: 2px solid var(--primary-color); border-radius: 10px; padding: 20px; text-align: center; }
-        .fare-display { font-size: 40px; font-weight: 900; color: var(--primary-color); margin: 10px 0; }
         
-        .matsuzono-info { background: #fff3e0; border-left: 5px solid #ff9800; padding: 15px; margin-top: 15px; text-align: left; font-size: 13px; line-height: 1.6; }
+        .suggestion-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100; display: none; max-height: 180px; overflow-y: auto; }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
+        .suggestion-item:hover { background: #f0f4ff; color: var(--primary-color); }
 
-        /* 位置情報（準備中） */
-        .live-map-area { height: 400px; background: #e0e0e0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #777; border: 2px dashed #bbb; }
+        .btn-exec { width: 100%; background: var(--accent-color); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: 900; font-size: 18px; cursor: pointer; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #error-msg { color: #d32f2f; background: #ffebee; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; font-weight: bold; font-size: 14px; text-align: center; border: 1px solid #ffcdd2; }
+
+        #search-result { margin-top: 20px; display: none; animation: fadeIn 0.4s ease-out; }
+        .result-box { border: 2px solid var(--primary-color); border-radius: 12px; padding: 20px; text-align: center; background: #fff; }
+        .fare-label { font-size: 12px; font-weight: bold; color: #666; }
+        .fare-display { font-size: 36px; font-weight: 900; color: var(--primary-color); margin: 5px 0; }
+        .dist-display { font-size: 14px; color: #444; background: #eee; display: inline-block; padding: 3px 10px; border-radius: 20px; margin-bottom: 15px; }
+        
+        .route-info { text-align: left; background: #f8f9fa; border-radius: 8px; padding: 12px; border-top: 1px solid #eee; }
+        .route-path { color: var(--accent-color); font-weight: 900; margin-top: 5px; font-size: 15px; display: flex; align-items: center; }
+        .route-path::before { content: "🚌"; margin-right: 5px; }
+
+        .matsuzono-info { background: #fff3e0; border-left: 5px solid #ff9800; padding: 12px; margin-top: 15px; text-align: left; font-size: 12px; border-radius: 4px; color: #873600; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900;">岩川県交通</div>
-    <div class="system-name">Multi-Route System v1.0</div>
+    <a href="https://nagabusfan.github.io/iwakawa/" class="header-logo">岩川県交通</a>
+    <div class="system-name">岩川県 運行支援基盤<br>Powered by Iwakawa IT Service</div>
 </header>
 
 <div class="tab-menu">
-    <div class="tab-item active" id="tab-search" onclick="switchMode('search')">経路・運賃検索</div>
+    <div class="tab-item active" id="tab-search" onclick="switchMode('search')">運賃・経路</div>
     <div class="tab-item" id="tab-live" onclick="switchMode('live')">バスロケ (LIVE)</div>
 </div>
 
 <div class="container">
     <div id="mode-search">
+        <div id="error-msg">停留所名が見つかりません</div>
         <div class="card">
             <div class="input-group">
-                <label>■ 出発停留所</label>
-                <input type="text" id="start-st" placeholder="入力またはメインサイトから引き継ぎ">
+                <label>■ 出発地</label>
+                <input type="text" id="start-st" placeholder="停留所名を入力" oninput="showSuggest('start')" autocomplete="off">
+                <div id="start-suggest" class="suggestion-list"></div>
             </div>
             <div class="input-group">
-                <label>■ 目的停留所</label>
-                <input type="text" id="end-st" placeholder="入力またはメインサイトから引き継ぎ">
+                <label>■ 目的地</label>
+                <input type="text" id="end-st" placeholder="停留所名を入力" oninput="showSuggest('end')" autocomplete="off">
+                <div id="end-suggest" class="suggestion-list"></div>
             </div>
             <button class="btn-exec" onclick="runSearch()">最安運賃を検索</button>
 
             <div id="search-result">
                 <div class="result-box">
-                    <div style="font-size: 12px; font-weight: bold;">片道普通運賃（大人）</div>
+                    <div class="fare-label">片道普通運賃（大人）</div>
                     <div class="fare-display" id="fare-val">--- 円</div>
-                    <div style="font-size: 12px; color: #666;">※ICカード・のりつぎ券利用時は異なります</div>
+                    <div class="dist-display">移動距離: <span id="dist-val">--</span> km</div>
+                    
+                    <div class="route-info">
+                        <strong style="font-size: 12px;">利用路線:</strong>
+                        <div class="route-path" id="route-val">---</div>
+                    </div>
                 </div>
                 <div id="matsuzono-box" class="matsuzono-info" style="display:none;">
-                    <strong>【重要】松曽野地区 乗り継ぎ案内</strong><br>
-                    この区間は松曽野地区の循環・支線が含まれます。「のりつぎ券」をお持ちの場合、基幹バスの初乗り運賃は免除されます。表示運賃は合算の目安です。
+                    <strong>【松曽野地区 乗り継ぎ注意】</strong><br>
+                    循環・支線をご利用の場合、乗車時に「のりつぎ券」をお取りください。
                 </div>
             </div>
         </div>
     </div>
 
     <div id="mode-live" style="display:none;">
-        <div class="card">
-            <h3 style="margin-top:0; color:var(--primary-color);">リアルタイム運行状況</h3>
-            <p style="font-size:13px;">サーバーを選択すると、走行中の25台のバス位置が表示されます。</p>
-            <div class="live-map-area">
-                <div style="font-size:40px;">🛰️</div>
-                <p>GPS信号待機中...</p>
-                <p style="font-size:11px;">(Roblox Data Link API 準備中)</p>
-            </div>
+        <div class="card" style="text-align:center; padding: 40px 20px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">🛰️</div>
+            <h3 style="margin:0; color:var(--primary-color);">バスロケーションシステム</h3>
+            <p style="font-size: 13px; color:#666;">Roblox各サーバーの運行状況を表示（準備中）</p>
         </div>
     </div>
 </div>
 
 <script>
-    // ページ読み込み時の処理
-    window.onload = () => {
+    let busData = { stops: [], fare_settings: { base_fare: 150, interval_km: 2.5, interval_fare: 30 } };
+
+    async function init() {
+        try {
+            const res = await fetch('route_data.json');
+            if (res.ok) {
+                busData = await res.json();
+            }
+        } catch (e) { console.error("Data load failed."); }
+        
         const p = new URLSearchParams(window.location.search);
         const f = p.get('from');
         const t = p.get('to');
         if (f) document.getElementById('start-st').value = f;
         if (t) document.getElementById('end-st').value = t;
         if (f && t) runSearch();
-    };
+    }
+    init();
 
-    function switchMode(m) {
-        if (m === 'search') {
-            document.getElementById('mode-search').style.display = 'block';
-            document.getElementById('mode-live').style.display = 'none';
-            document.getElementById('tab-search').classList.add('active');
-            document.getElementById('tab-live').classList.remove('active');
-        } else {
-            document.getElementById('mode-search').style.display = 'none';
-            document.getElementById('mode-live').style.display = 'block';
-            document.getElementById('tab-search').classList.remove('active');
-            document.getElementById('tab-live').classList.add('active');
-        }
+    function showSuggest(type) {
+        const input = document.getElementById(type + '-st');
+        const list = document.getElementById(type + '-suggest');
+        const word = input.value.trim().toLowerCase();
+        list.innerHTML = '';
+        if (!word || !busData.stops) { list.style.display = 'none'; return; }
+        
+        const matches = busData.stops.filter(s => s.name.includes(word));
+        if (matches.length > 0) {
+            matches.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerText = s.name;
+                item.onclick = () => { input.value = s.name; list.style.display = 'none'; runSearch(); };
+                list.appendChild(item);
+            });
+            list.style.display = 'block';
+        } else { list.style.display = 'none'; }
     }
 
     function runSearch() {
-        const start = document.getElementById('start-st').value;
-        const end = document.getElementById('end-st').value;
-        if(!start || !end) return;
+        const sName = document.getElementById('start-st').value.trim();
+        const eName = document.getElementById('end-st').value.trim();
+        const start = busData.stops.find(s => s.name === sName);
+        const end = busData.stops.find(s => s.name === eName);
 
-        document.getElementById('search-result').style.display = 'block';
-        document.getElementById('fare-val').innerText = "320 円"; // あとで計算ロジックを入れる
-
-        // 松曽野チェック
-        if (start.includes("松曽野") || end.includes("松曽野")) {
-            document.getElementById('matsuzono-box').style.display = 'block';
-        } else {
-            document.getElementById('matsuzono-box').style.display = 'none';
+        if (!start || !end || sName === eName) {
+            if(sName && eName) document.getElementById('error-msg').style.display = 'block';
+            document.getElementById('search-result').style.display = 'none';
+            return;
         }
+
+        document.getElementById('error-msg').style.display = 'none';
+        document.getElementById('search-result').style.display = 'block';
+
+        // 1. 距離計算
+        const distance = Math.abs(start.dist - end.dist);
+        document.getElementById('dist-val').innerText = distance.toFixed(1);
+
+        // 2. 運賃計算（2.5kmごとに30円加算）
+        const settings = busData.fare_settings;
+        const additionalFare = Math.ceil(distance / settings.interval_km) * settings.interval_fare;
+        const fare = settings.base_fare + additionalFare;
+        document.getElementById('fare-val').innerText = fare + " 円";
+
+        // 3. 共通路線の判定
+        const common = start.lines.filter(l => end.lines.includes(l));
+        document.getElementById('route-val').innerText = common.length > 0 ? common.join('・') : "複数路線乗り継ぎ";
+
+        // 4. エリアチェック
+        document.getElementById('matsuzono-box').style.display = 
+            (start.area === "matsuzono" || end.area === "matsuzono") ? 'block' : 'none';
+    }
+
+    function switchMode(m) {
+        document.getElementById('mode-search').style.display = (m === 'search') ? 'block' : 'none';
+        document.getElementById('mode-live').style.display = (m === 'live') ? 'block' : 'none';
+        document.getElementById('tab-search').classList.toggle('active', m === 'search');
+        document.getElementById('tab-live').classList.toggle('active', m === 'live');
     }
 </script>
 </body>
