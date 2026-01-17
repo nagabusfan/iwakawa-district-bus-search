@@ -2,8 +2,8 @@
   "stops": [
     { "name": "堀岡駅", "dist": 0, "lines": ["駅中田線", "荒巻空港線","九川中央線","赤山町線"], "area": "city" },
     { "name": "夕日橋", "dist": 0.3, "lines": ["九川中央線", "赤山町線"], "area": "city" },
-    { "name": "朝顔瀬橋", "dist": 0.9, "lines": ["九川中央線","赤山町線"], "area": "" },
-    { "name": "両原", "dist": 1.2, "lines": ["九川中央線","赤山町線"], "area": "city" }
+    { "name": "朝顔瀬橋", "dist": 0.9, "lines": ["九川中央線","赤山町線"], "area": "city" },
+    { "name": "両原", "dist": 1.2, "lines": ["九川中央線","赤山町線"], "area": "city" },
     { "name": "建坂橋", "dist": 1.6, "lines": ["九川中央線"], "area": "suburb" }
   ],
   "fare_settings": {
