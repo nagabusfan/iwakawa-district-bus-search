@@ -8,55 +8,39 @@
     <style>
         :root { --primary-color: #0d47a1; --accent-color: #2e7d32; --bg-color: #f4f7f9; }
         body { font-family: 'Noto Sans JP', sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: #333; }
-        
         header { background-color: var(--primary-color); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--accent-color); }
         .header-logo { cursor: pointer; font-weight: 900; text-decoration: none; color: white; font-size: 18px; }
-        .system-name { font-size: 11px; opacity: 0.8; text-align: right; }
-
         .tab-menu { display: flex; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-item { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; color: #666; border-bottom: 3px solid transparent; }
         .tab-item.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background: #f0f4ff; }
-
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-
         .input-group { margin-bottom: 15px; position: relative; }
         .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: var(--primary-color); }
         .input-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
-        
         .suggestion-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100; display: none; max-height: 180px; overflow-y: auto; }
         .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
         .suggestion-item:hover { background: #f0f4ff; color: var(--primary-color); }
-
         .btn-exec { width: 100%; background: var(--accent-color); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: 900; font-size: 18px; cursor: pointer; }
-
-        #error-msg { color: #d32f2f; background: #ffebee; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; font-weight: bold; font-size: 14px; text-align: center; border: 1px solid #ffcdd2; }
-
-        #search-result { margin-top: 20px; display: none; animation: fadeIn 0.4s ease-out; }
+        #error-msg { color: #d32f2f; background: #ffebee; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; font-weight: bold; text-align: center; border: 1px solid #ffcdd2; }
+        #search-result { margin-top: 20px; display: none; }
         .result-box { border: 2px solid var(--primary-color); border-radius: 12px; padding: 20px; text-align: center; background: #fff; }
-        .fare-label { font-size: 12px; font-weight: bold; color: #666; }
         .fare-display { font-size: 36px; font-weight: 900; color: var(--primary-color); margin: 5px 0; }
         .dist-display { font-size: 14px; color: #444; background: #eee; display: inline-block; padding: 3px 10px; border-radius: 20px; margin-bottom: 15px; }
-        
-        .route-info { text-align: left; background: #f8f9fa; border-radius: 8px; padding: 12px; border-top: 1px solid #eee; }
-        .route-path { color: var(--accent-color); font-weight: 900; margin-top: 5px; font-size: 15px; display: flex; align-items: center; }
-        .route-path::before { content: "🚌"; margin-right: 5px; }
-
+        .route-path { color: var(--accent-color); font-weight: 900; margin-top: 5px; font-size: 15px; }
         .matsuzono-info { background: #fff3e0; border-left: 5px solid #ff9800; padding: 12px; margin-top: 15px; text-align: left; font-size: 12px; border-radius: 4px; color: #873600; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <header>
     <a href="https://nagabusfan.github.io/iwakawa/" class="header-logo">岩川県交通</a>
-    <div class="system-name">岩川県 運行支援基盤<br>Powered by Iwakawa IT Service</div>
+    <div style="font-size:10px; opacity:0.8;">岩川県 運行支援基盤</div>
 </header>
 
 <div class="tab-menu">
-    <div class="tab-item active" id="tab-search" onclick="switchMode('search')">運賃・経路</div>
-    <div class="tab-item" id="tab-live" onclick="switchMode('live')">バスロケ (LIVE)</div>
+    <div class="tab-item active" onclick="switchMode('search')">運賃・経路</div>
+    <div class="tab-item" onclick="switchMode('live')">バスロケ (LIVE)</div>
 </div>
 
 <div class="container">
@@ -77,12 +61,11 @@
 
             <div id="search-result">
                 <div class="result-box">
-                    <div class="fare-label">片道普通運賃（大人）</div>
+                    <div style="font-size:12px; font-weight:bold; color:#666;">片道普通運賃（大人）</div>
                     <div class="fare-display" id="fare-val">--- 円</div>
                     <div class="dist-display">移動距離: <span id="dist-val">--</span> km</div>
-                    
-                    <div class="route-info">
-                        <strong style="font-size: 12px;">利用路線:</strong>
+                    <div style="text-align:left; background:#f8f9fa; padding:10px; border-radius:8px;">
+                        <strong style="font-size:12px;">利用路線:</strong>
                         <div class="route-path" id="route-val">---</div>
                     </div>
                 </div>
@@ -93,30 +76,28 @@
             </div>
         </div>
     </div>
-
     <div id="mode-live" style="display:none;">
-        <div class="card" style="text-align:center; padding: 40px 20px;">
-            <div style="font-size: 40px; margin-bottom: 10px;">🛰️</div>
-            <h3 style="margin:0; color:var(--primary-color);">バスロケーションシステム</h3>
-            <p style="font-size: 13px; color:#666;">Roblox各サーバーの運行状況を表示（準備中）</p>
-        </div>
+        <div class="card" style="text-align:center; padding:40px;"><h3>LIVE 準備中</h3></div>
     </div>
 </div>
 
 <script>
     let busData = { stops: [], fare_settings: { base_fare: 150, interval_km: 2.5, interval_fare: 30 } };
 
+    // 漢字から簡易的に「よみがな」を推測するための辞書（データいじらなくていいようにここに追加）
+    const kanaMap = {
+        "堀岡駅": "ほりおかえき", "夕日橋": "ゆうひばし", "朝顔瀬橋": "あさがおせばし",
+        "両原": "りょうばら", "建坂橋": "たてさかばし"
+    };
+
     async function init() {
         try {
             const res = await fetch('route_data.json');
-            if (res.ok) {
-                busData = await res.json();
-            }
-        } catch (e) { console.error("Data load failed."); }
+            if (res.ok) busData = await res.json();
+        } catch (e) { console.error("Load failed"); }
         
         const p = new URLSearchParams(window.location.search);
-        const f = p.get('from');
-        const t = p.get('to');
+        const f = p.get('from'), t = p.get('to');
         if (f) document.getElementById('start-st').value = f;
         if (t) document.getElementById('end-st').value = t;
         if (f && t) runSearch();
@@ -124,13 +105,16 @@
     init();
 
     function showSuggest(type) {
-        const input = document.getElementById(type + '-st');
-        const list = document.getElementById(type + '-suggest');
+        const input = document.getElementById(type + '-st'), list = document.getElementById(type + '-suggest');
         const word = input.value.trim().toLowerCase();
         list.innerHTML = '';
         if (!word || !busData.stops) { list.style.display = 'none'; return; }
         
-        const matches = busData.stops.filter(s => s.name.includes(word));
+        const matches = busData.stops.filter(s => {
+            const yomi = kanaMap[s.name] || ""; // 辞書から読みを引く
+            return s.name.includes(word) || yomi.includes(word);
+        });
+        
         if (matches.length > 0) {
             matches.forEach(s => {
                 const item = document.createElement('div');
@@ -158,40 +142,23 @@
         document.getElementById('error-msg').style.display = 'none';
         document.getElementById('search-result').style.display = 'block';
 
-        // 1. 距離計算
-        const distance = Math.abs(start.dist - end.dist);
-        document.getElementById('dist-val').innerText = distance.toFixed(1);
-
-        // 2. 運賃計算（2.5kmごとに30円加算・現金IC同額）
+        const dist = Math.abs(start.dist - end.dist);
         const settings = busData.fare_settings;
-        const additionalFare = Math.ceil(distance / settings.interval_km) * settings.interval_fare;
-        const fare = settings.base_fare + additionalFare;
+        const fare = settings.base_fare + (Math.ceil(dist / settings.interval_km) * settings.interval_fare);
+
+        document.getElementById('dist-val').innerText = dist.toFixed(1);
         document.getElementById('fare-val').innerText = fare + " 円";
 
-        // 3. 共通路線の判定
         const common = start.lines.filter(l => end.lines.includes(l));
-        const isTransferNeeded = (common.length === 0);
+        document.getElementById('route-val').innerText = common.length > 0 ? common.join('・') : "複数路線の乗り継ぎが必要です";
 
-        if (isTransferNeeded) {
-            document.getElementById('route-val').innerText = "複数路線の乗り継ぎが必要です";
-        } else {
-            document.getElementById('route-val').innerText = common.join('・');
-        }
-
-        // 4. 松曽野チェック（乗り継ぎが必要 且つ どちらかが松曽野エリアの場合のみ表示）
-        const isMatsuzonoArea = (start.area === "matsuzono" || end.area === "matsuzono");
-        if (isTransferNeeded && isMatsuzonoArea) {
-            document.getElementById('matsuzono-box').style.display = 'block';
-        } else {
-            document.getElementById('matsuzono-box').style.display = 'none';
-        }
+        const isMatsuzono = (start.area === "matsuzono" || end.area === "matsuzono");
+        document.getElementById('matsuzono-box').style.display = (common.length === 0 && isMatsuzono) ? 'block' : 'none';
     }
 
     function switchMode(m) {
         document.getElementById('mode-search').style.display = (m === 'search') ? 'block' : 'none';
         document.getElementById('mode-live').style.display = (m === 'live') ? 'block' : 'none';
-        document.getElementById('tab-search').classList.toggle('active', m === 'search');
-        document.getElementById('tab-live').classList.toggle('active', m === 'live');
     }
 </script>
 </body>
